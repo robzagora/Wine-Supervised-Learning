@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachineLearning", "MachineLearning\MachineLearning.csproj", "{E0CBE3E9-B63E-41A7-A9AD-5DB501EAC5E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{919CAC3C-07F7-47A1-B6E5-EAC26B9E17FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{55953D26-9F85-4463-A468-78FB0927A0EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{E0CBE3E9-B63E-41A7-A9AD-5DB501EAC5E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0CBE3E9-B63E-41A7-A9AD-5DB501EAC5E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0CBE3E9-B63E-41A7-A9AD-5DB501EAC5E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{919CAC3C-07F7-47A1-B6E5-EAC26B9E17FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{919CAC3C-07F7-47A1-B6E5-EAC26B9E17FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{919CAC3C-07F7-47A1-B6E5-EAC26B9E17FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{919CAC3C-07F7-47A1-B6E5-EAC26B9E17FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55953D26-9F85-4463-A468-78FB0927A0EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55953D26-9F85-4463-A468-78FB0927A0EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55953D26-9F85-4463-A468-78FB0927A0EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55953D26-9F85-4463-A468-78FB0927A0EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

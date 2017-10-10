@@ -14,15 +14,19 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="#717171" Margin="16">
-            <StackPanel Background="White" Margin="2">
+        <Border Grid.Column="0" Background="#717171" Margin="16" >
+            <StackPanel Margin="2">
+                <StackPanel.Background>
+                    <SolidColorBrush Color="White" Opacity="0.95"/>
+                </StackPanel.Background>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" IsEnabled="{Binding CanModifyNetwork}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
@@ -35,8 +39,23 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Row="0" Grid.Column="0" Margin="16" VerticalAlignment="Center">
-                            <Label Name="Label_TotalEpochs" Content="Configure Epoch Amount"></Label>
+                            <Label Name="Label_TotalEpochs" Content="Epoch Amount"></Label>
                             <TextBox Text="{Binding TotalEpochs}"></TextBox>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="16" VerticalAlignment="Center">
+                            <Label Name="Label_LearningRate" Content="Learning Rate"></Label>
+                            <TextBox Text="{Binding LearningRate}"></TextBox>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="16" VerticalAlignment="Center">
+                            <Label Name="Label_Momentum" Content="Momentum"></Label>
+                            <TextBox Text="{Binding Momentum}"></TextBox>
+                        </StackPanel>
+                        <StackPanel Grid.Row="0" Grid.Column="3" Margin="16" VerticalAlignment="Center">
+                            <Button Click="Button_Reset">
+                                Reset
+                            </Button>
                         </StackPanel>
                     </Grid>
                     
@@ -51,9 +70,9 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="16" VerticalAlignment="Center">
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="16" VerticalAlignment="Center" IsEnabled="{Binding CanModifyNetwork}">
                             <Button Click="Button_Click">
-                                Run
+                                Train
                             </Button>
                         </StackPanel>
                         <StackPanel Grid.Row="0" Grid.Column="1" Margin="16" VerticalAlignment="Center">
@@ -65,14 +84,46 @@
                             <TextBlock Text="{Binding CurrentError}" ></TextBlock>
                         </StackPanel>
                     </Grid>
-                    
+
+                    <Grid Grid.Row="2" IsEnabled="{Binding CanTestNetwork}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="16" VerticalAlignment="Center">
+                            <Button Name="Button_TestNetwork" Click="Button_TestNetwork_Click">
+                                Test Network w/ Random Data
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="16" VerticalAlignment="Center">
+                            <Label Name="Label_TestOutput" Content="Expected Output"></Label>
+                            <Label Content="{Binding TestExpectedOutput}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="2" Margin="16" VerticalAlignment="Center">
+                            <Label Name="Label_ActualOutput" Content="Actual Output"></Label>
+                            <Label Content="{Binding TestActualOutput}" />
+                        </StackPanel>
+                        
+                    </Grid>
+
                 </Grid>
             </StackPanel>
         </Border>
 
-        <Border Grid.Column="1" Background="#717171" Margin="16">
-            <StackPanel  Background="White" Margin="2">
-
+        <Border Grid.Column="1" Background="#717171" Margin="16" IsEnabled="False">
+            <StackPanel Margin="2">
+                <StackPanel.Background>
+                    <SolidColorBrush Color="White" Opacity="0.95"/>
+                </StackPanel.Background>
             </StackPanel>
         </Border>
     </Grid>

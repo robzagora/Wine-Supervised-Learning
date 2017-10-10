@@ -1,57 +1,47 @@
 ﻿namespace MachineLearning.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Timers;
     using Accord.Neuro;
     using Accord.Neuro.ActivationFunctions;
     using Accord.Neuro.Learning;
     using Accord.Neuro.Networks;
     using MachineLearning.Controls;
     using MachineLearning.Models;
+    using static Common.Extensions.RandomizerExtensions;
 
     public class MainViewModel : ViewModelBase
     {
         private double learningRate, momentum, currentError;
         private int totalEpochs, currentEpoch;
 
+        private readonly NetworkDataBag trainingDataSet, testDataSet;
+
         private DeepBeliefNetwork network;
         private ISupervisedLearning teacher;
 
         private readonly double[][] inputVector, outputVector;
 
-        public MainViewModel(NetworkDataBag dataBag)
+        private bool canTestNetwork, canModifyNetwork;
+        private string testExpectedOutput, testActualOutput;
+
+        // https://github.com/accord-net/framework/tree/master/Samples/Neuro/Deep%20Learning
+        public MainViewModel(NetworkDataBag trainingDataSet, NetworkDataBag testDataSet)
         {
-            if (dataBag == null)
-            {
-                throw new ArgumentNullException(nameof(dataBag));
-            }
-
-            // https://github.com/accord-net/framework/tree/master/Samples/Neuro/Deep%20Learning
-
+            this.trainingDataSet = trainingDataSet ?? throw new ArgumentNullException(nameof(trainingDataSet));
+            this.testDataSet = testDataSet ?? throw new ArgumentNullException(nameof(testDataSet));
+            
             this.network = new DeepBeliefNetwork(new BernoulliFunction(), WineData.TotalAvailableInputs, hiddenNeurons: WineData.TotalAvailableOutputs);
 
-            new GaussianWeights(this.network).Randomize();
-            this.network.UpdateVisibleWeights();
+            this.ToInitialSettings();
 
-            this.learningRate = 0.3;
-            this.momentum = 0.9;
-            this.totalEpochs = 200;
-
-            this.teacher = new BackPropagationLearning(this.network)
-            {
-                LearningRate = this.learningRate,
-                Momentum = this.momentum
-            };
-
-            double[][] inputs = new double[dataBag.Data.Count()][],
-                outputs = new double[dataBag.Data.Count()][];
+            double[][] inputs = new double[trainingDataSet.Data.Count()][],
+                outputs = new double[trainingDataSet.Data.Count()][];
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                var dataSet = dataBag.Data.ElementAt(i);
+                var dataSet = trainingDataSet.Data.ElementAt(i);
 
                 inputs[i] = dataSet.Input;
                 outputs[i] = dataSet.Output;
@@ -91,10 +81,33 @@
             set { this.SetField(ref this.currentError, value, nameof(this.CurrentError)); }
         }
 
+        public bool CanModifyNetwork
+        {
+            get { return this.canModifyNetwork; }
+            private set { this.SetField(ref this.canModifyNetwork, value, nameof(this.CanModifyNetwork)); }
+        }
+
+        public bool CanTestNetwork
+        {
+            get { return this.canTestNetwork; }
+            private set { this.SetField(ref this.canTestNetwork, value, nameof(this.CanTestNetwork)); }
+        }
+
+        public string TestExpectedOutput
+        {
+            get { return this.testExpectedOutput; }
+            private set { this.SetField(ref this.testExpectedOutput, value, nameof(this.TestExpectedOutput)); }
+        }
+
+        public string TestActualOutput
+        {
+            get { return this.testActualOutput; }
+            private set { this.SetField(ref this.testActualOutput, value, nameof(this.TestActualOutput)); }
+        }
+
         public async void Start()
         {
-            this.CurrentEpoch = 0;
-            this.CurrentError = 0;
+            this.CanModifyNetwork = false;
 
             await Task.Run(() =>
             {
@@ -108,6 +121,46 @@
             });
 
             this.network.UpdateVisibleWeights();
+
+            this.CanModifyNetwork = true;
+            this.CanTestNetwork = true;
+        }
+
+        public void Reset()
+        {
+            this.ToInitialSettings();
+        }
+        
+        public void TestNetworkWithRandomTestData()
+        {
+            NetworkInputOutputData data = this.testDataSet.Data.GetRandomElement();
+
+            var output = this.network.Compute(data.Input);
+
+            this.TestExpectedOutput = data.Output.Select(d => d.ToString()).Aggregate((curr, next) => curr + "-" + next);
+            this.TestActualOutput = output.Select(d => Math.Round(d, 3).ToString()).Aggregate((curr, next) => curr + "-" + next);
+        }
+
+        private void ToInitialSettings()
+        {
+            this.Momentum = 0.9;
+            this.LearningRate = 0.3;
+            this.TotalEpochs = 2000;
+
+            this.CurrentEpoch = 0;
+            this.CurrentError = 0;
+
+            this.CanModifyNetwork = true;
+            this.CanTestNetwork = false;
+
+            new GaussianWeights(this.network).Randomize();
+            this.network.UpdateVisibleWeights();
+
+            this.teacher = new BackPropagationLearning(this.network)
+            {
+                LearningRate = this.learningRate,
+                Momentum = this.momentum
+            };
         }
     }
 }

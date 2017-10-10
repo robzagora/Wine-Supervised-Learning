@@ -36,48 +36,65 @@
             var trainingData = grouping.FirstOrDefault(g => g.Key == true);
             var testData = grouping.FirstOrDefault(g => g.Key == false);
 
-            var lines = File.ReadAllLines(trainingData.Single()).Where(l => !string.IsNullOrWhiteSpace(l));
+            var trainingBag = this.CreateDataBagFromSource(trainingData.Single());
+            var testBag = this.CreateDataBagFromSource(testData.Single());
+            
+            this.viewModel = new MainViewModel(trainingBag, testBag);
 
-            var data = lines.Select(l =>
-            {
-                var split = l.Split(',');
+            this.DataContext = viewModel;
+        }
 
-                return new WineData
+        private NetworkDataBag CreateDataBagFromSource(string dataSetPath)
+        {
+            var lines = File.ReadAllLines(dataSetPath).Where(l => !string.IsNullOrWhiteSpace(l));
+
+            var data = lines
+                .Select(l =>
                 {
-                    Class = split[WineData.WineClassIndex],
-                    Alcohol = Convert.ToDouble(split[WineData.AlcoholIndex]),
-                    MalicAcid = Convert.ToDouble(split[WineData.MalicAcidIndex]),
-                    Ash = Convert.ToDouble(split[WineData.AshIndex]),
-                    AshAlcalinity = Convert.ToDouble(split[WineData.AshAlcalinityIndex]),
-                    Magnesium = Convert.ToDouble(split[WineData.MagnesiumIndex]),
-                    TotalPhenols = Convert.ToDouble(split[WineData.TotalPhenolsIndex]),
-                    Flavanoids = Convert.ToDouble(split[WineData.FlavanoidsIndex]),
-                    NonflavanoidPhenols = Convert.ToDouble(split[WineData.NonflavanoidPhenolsIndex]),
-                    Proanthocyanins = Convert.ToDouble(split[WineData.ProanthocyaninsIndex]),
-                    ColorIntensity = Convert.ToDouble(split[WineData.ColorIntensityIndex]),
-                    Hue = Convert.ToDouble(split[WineData.HueIndex]),
-                    DilutedWines = Convert.ToDouble(split[WineData.DilutedWinesIndex]),
-                    Proline = Convert.ToDouble(split[WineData.ProlineIndex]),
-                };
-            })
-            .ToArray();
+                    var split = l.Split(',');
+
+                    return new WineData
+                    {
+                        Class = split[WineData.WineClassIndex],
+                        Alcohol = Convert.ToDouble(split[WineData.AlcoholIndex]),
+                        MalicAcid = Convert.ToDouble(split[WineData.MalicAcidIndex]),
+                        Ash = Convert.ToDouble(split[WineData.AshIndex]),
+                        AshAlcalinity = Convert.ToDouble(split[WineData.AshAlcalinityIndex]),
+                        Magnesium = Convert.ToDouble(split[WineData.MagnesiumIndex]),
+                        TotalPhenols = Convert.ToDouble(split[WineData.TotalPhenolsIndex]),
+                        Flavanoids = Convert.ToDouble(split[WineData.FlavanoidsIndex]),
+                        NonflavanoidPhenols = Convert.ToDouble(split[WineData.NonflavanoidPhenolsIndex]),
+                        Proanthocyanins = Convert.ToDouble(split[WineData.ProanthocyaninsIndex]),
+                        ColorIntensity = Convert.ToDouble(split[WineData.ColorIntensityIndex]),
+                        Hue = Convert.ToDouble(split[WineData.HueIndex]),
+                        DilutedWines = Convert.ToDouble(split[WineData.DilutedWinesIndex]),
+                        Proline = Convert.ToDouble(split[WineData.ProlineIndex]),
+                    };
+                })
+                .ToArray();
 
             WineNormalisationConverter converter = new WineNormalisationConverter();
             IEnumerable<WineNormalisedData> normalisedData = converter.Convert(data);
 
-            var dataBag = new NetworkDataBag(
+            return new NetworkDataBag(
                 normalisedData.Select(d => new NetworkInputOutputData(d.Inputs, d.Outputs)).ToArray(),
                 WineData.TotalAvailableInputs,
                 WineData.TotalAvailableOutputs);
-
-            this.viewModel = new MainViewModel(dataBag);
-
-            this.DataContext = viewModel;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.viewModel.Start();
+        }
+
+        private void Button_TestNetwork_Click(object sender, RoutedEventArgs e)
+        {
+            this.viewModel.TestNetworkWithRandomTestData();
+        }
+
+        private void Button_Reset(object sender, RoutedEventArgs e)
+        {
+            this.viewModel.Reset();
         }
     }
 }

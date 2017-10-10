@@ -19,20 +19,17 @@
 
         private DeepBeliefNetwork network;
         private ISupervisedLearning teacher;
-        private Timer timer;
 
         private readonly double[][] inputVector, outputVector;
 
-        public MainViewModel(IEnumerable<WineNormalisedData> trainingSet)
+        public MainViewModel(NetworkDataBag dataBag)
         {
-            if (trainingSet == null)
+            if (dataBag == null)
             {
-                throw new ArgumentNullException(nameof(trainingSet));
+                throw new ArgumentNullException(nameof(dataBag));
             }
 
             // https://github.com/accord-net/framework/tree/master/Samples/Neuro/Deep%20Learning
-
-            this.timer = new Timer(100);
 
             this.network = new DeepBeliefNetwork(new BernoulliFunction(), WineData.TotalAvailableInputs, hiddenNeurons: WineData.TotalAvailableOutputs);
 
@@ -49,15 +46,15 @@
                 Momentum = this.momentum
             };
 
-            double[][] inputs = new double[trainingSet.Count()][],
-                outputs = new double[trainingSet.Count()][];
+            double[][] inputs = new double[dataBag.Data.Count()][],
+                outputs = new double[dataBag.Data.Count()][];
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                var dataSet = trainingSet.ElementAt(i);
+                var dataSet = dataBag.Data.ElementAt(i);
 
-                inputs[i] = dataSet.Inputs;
-                outputs[i] = dataSet.Outputs;
+                inputs[i] = dataSet.Input;
+                outputs[i] = dataSet.Output;
             }
 
             this.inputVector = inputs;
@@ -94,33 +91,23 @@
             set { this.SetField(ref this.currentError, value, nameof(this.CurrentError)); }
         }
 
-        public void Start()
+        public async void Start()
         {
             this.CurrentEpoch = 0;
             this.CurrentError = 0;
 
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
-        }
-
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if (this.CurrentEpoch == this.TotalEpochs)
+            await Task.Run(() =>
             {
-                this.timer.Stop();
-                this.timer.Elapsed -= this.Timer_Elapsed;
+                for (int i = 0; i < this.totalEpochs; i++)
+                {
+                    double error = this.teacher.RunEpoch(this.inputVector, this.outputVector);
 
-                this.network.UpdateVisibleWeights();
-            }
-
-            // Start running the learning procedure
-            Task.Run(() =>
-            {
-                double error = this.teacher.RunEpoch(this.inputVector, this.outputVector);
-                
-                this.CurrentEpoch += 1;
-                this.CurrentError = error;
+                    this.CurrentEpoch += 1;
+                    this.CurrentError = error;
+                }
             });
+
+            this.network.UpdateVisibleWeights();
         }
     }
 }

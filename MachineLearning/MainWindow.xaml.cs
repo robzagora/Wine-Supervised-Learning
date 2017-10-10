@@ -65,7 +65,12 @@
             WineNormalisationConverter converter = new WineNormalisationConverter();
             IEnumerable<WineNormalisedData> normalisedData = converter.Convert(data);
 
-            this.viewModel = new MainViewModel(normalisedData);
+            var dataBag = new NetworkDataBag(
+                normalisedData.Select(d => new NetworkInputOutputData(d.Inputs, d.Outputs)).ToArray(),
+                WineData.TotalAvailableInputs,
+                WineData.TotalAvailableOutputs);
+
+            this.viewModel = new MainViewModel(dataBag);
 
             this.DataContext = viewModel;
         }

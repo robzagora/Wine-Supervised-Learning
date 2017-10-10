@@ -11,6 +11,7 @@
         {
             MainWindow window = new MainWindow();
             window.Show();
+            window.Activate();
         }
     }
 }

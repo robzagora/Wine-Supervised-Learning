@@ -75,6 +75,8 @@
     <Compile Include="Controls\IViewModel.cs" />
     <Compile Include="Controls\ViewModelBase.cs" />
     <Compile Include="Extensions\ViewModelExtensions.cs" />
+    <Compile Include="Models\NetworkDataBag.cs" />
+    <Compile Include="Models\NetworkInputOutputData.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
